@@ -5,8 +5,6 @@ import java.util.Comparator;
 public enum SortingOrder {
     ASC, DESC, RATING;
 
-    //private MovieComparator comparator = new MovieComparator();
-
     public Comparator<Movie> getComparator() {
         switch(this) {
             case ASC:
