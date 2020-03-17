@@ -1,15 +1,22 @@
 package com.accenture.bootcamp.movies;
 
 
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.Table;
+import javax.persistence.Transient;
 import java.util.List;
 
-
+@Entity
+@Table(name = "movies")
 public class Movie {
 
+    @Id
     private String id;
     private String name;
     private String description;
     private Float rating;
+    @Transient
     private List<String> cast;
 
     public String getId() {
