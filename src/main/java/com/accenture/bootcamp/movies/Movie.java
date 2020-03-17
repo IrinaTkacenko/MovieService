@@ -1,23 +1,16 @@
 package com.accenture.bootcamp.movies;
 
-import javax.persistence.*;
+
 import java.util.List;
 
-@Entity
-@Table(name = "movies")
+
 public class Movie {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
     private String id;
     private String name;
     private String description;
     private Float rating;
     private List<String> cast;
-
-    protected Movie() {}
-
-
 
     public String getId() {
         return id;
@@ -58,10 +51,4 @@ public class Movie {
     public void setCast(List<String> cast) {
         this.cast = cast;
     }
-
-//
-//    @Override
-//    public int compareTo(Movie movie) {
-//        return name.compareTo(movie.name);
-//    }
 }

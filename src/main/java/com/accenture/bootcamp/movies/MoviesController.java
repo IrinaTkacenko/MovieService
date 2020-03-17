@@ -11,8 +11,7 @@ import java.util.Map;
 @RestController
 public class MoviesController {
 
-    @Autowired
-    MoviesService movies;
+    @Autowired MoviesService movies;
 
     @GetMapping("/movies")
     public List<Movie> showMovies(@RequestParam(defaultValue = "ASC") SortingOrder sort) {

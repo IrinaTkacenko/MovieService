@@ -13,21 +13,8 @@ import static java.util.Arrays.asList;
 
 @Service
 public class MoviesService {
-    private Map<String, Movie> movies = new HashMap<>();
 
     @Autowired private JdbcTemplate jdbcTemplate;
-
-    @PostConstruct
-    public void initMovies() {
-
-        Movie movie = new Movie();
-        movie.setId(UUID.randomUUID().toString());
-        movie.setName("1917");
-        movie.setDescription("Its a movie about war and two friends saving comrades.");
-        movie.setRating(8.3F);
-        movie.setCast(asList("Benedict Cumberbatch", "George McKay"));
-        movies.put(movie.getId(), movie);
-    }
 
     public List<Movie> movies(SortingOrder order) {
         String sqlQuery = "SELECT * FROM movies";
@@ -37,18 +24,9 @@ public class MoviesService {
         return movieList;
     }
 
-    private Movie mapRowToMovie(ResultSet resultSet,int rowNum) throws SQLException {
-        Movie movie = new Movie();
-        movie.setId(resultSet.getString("id"));
-        movie.setName(resultSet.getString("movie_name"));
-        movie.setDescription(resultSet.getString("movie_description"));
-        movie.setRating(resultSet.getFloat("movie_rating"));
-        return movie;
-    }
-
     public void create(Movie movie) {
         movie.setId(UUID.randomUUID().toString());
-        String sqlQuery = "INSERT INTO movies(id, movie_name, movie_description, movie_rating)" +
+        String sqlQuery = "INSERT INTO movies(id, name, description, rating)" +
                 " VALUES(?, ?, ?, ?)";
         jdbcTemplate.update(sqlQuery, movie.getId(), movie.getName(), movie.getDescription(), movie.getRating());
         System.out.println("Creating movie " + movie.getId());
@@ -56,10 +34,7 @@ public class MoviesService {
 
     public void update(String id, Movie movie) {
         System.out.println("Updating movie " + id);
-        String sqlQuery = "UPDATE movies SET movie_name = ?, " +
-                                            "movie_description = ?, " +
-                                            "movie_rating = ? " +
-                                            "WHERE id = ?";
+        String sqlQuery = "UPDATE movies SET name = ?, description = ?, rating = ? WHERE id = ?";
         jdbcTemplate.update(sqlQuery, movie.getName(), movie.getDescription(), movie.getRating(), movie.getId());
     }
 
@@ -67,5 +42,14 @@ public class MoviesService {
         System.out.println("Deleting movie " + id);
         String sqlQuery = "DELETE FROM movies WHERE id = ?";
         jdbcTemplate.update(sqlQuery, id);
+    }
+
+    private Movie mapRowToMovie(ResultSet resultSet,int rowNum) throws SQLException {
+        Movie movie = new Movie();
+        movie.setId(resultSet.getString("id"));
+        movie.setName(resultSet.getString("name"));
+        movie.setDescription(resultSet.getString("description"));
+        movie.setRating(resultSet.getFloat("rating"));
+        return movie;
     }
 }
