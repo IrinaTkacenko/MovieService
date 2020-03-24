@@ -8,7 +8,12 @@ import java.util.*;
 @Service
 public class MoviesService {
 
-    @Autowired private MovieRepository movieRepository;
+    private final MovieRepository movieRepository;
+
+    @Autowired
+    public MoviesService(MovieRepository movieRepository) {
+        this.movieRepository = movieRepository;
+    }
 
     public Iterable<Movie> movies(SortingOrder order) {
         List<Movie> movieList = (List<Movie>) movieRepository.findAll();
@@ -17,23 +22,15 @@ public class MoviesService {
     }
 
     public void create(Movie movie) {
-        movie.setId(UUID.randomUUID().toString());
         movieRepository.save(movie);
     }
 
-    public void update(String id, Movie movie) {
-        Optional<Movie> optionalMovie = movieRepository.findById(id);
-        if(optionalMovie.isPresent()) {
-            movieRepository.deleteById(id);
-            movie.setId(id);
-            movieRepository.save(movie);
-        }
+    public Movie checkId(String id) {
+        return movieRepository.findById(id)
+                .orElseThrow(()-> new IllegalArgumentException("Invalid movie Id: " + id));
     }
 
     public void delete(String id) {
-        Optional<Movie> optionalMovie = movieRepository.findById(id);
-        if(optionalMovie.isPresent()) {
-            movieRepository.deleteById(id);
-        }
+        movieRepository.delete(checkId(id));
     }
 }

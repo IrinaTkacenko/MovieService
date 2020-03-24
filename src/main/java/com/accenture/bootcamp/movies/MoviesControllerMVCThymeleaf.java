@@ -1,28 +1,20 @@
 package com.accenture.bootcamp.movies;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import sun.security.util.math.IntegerModuloP;
-
-import javax.validation.Valid;
+import org.springframework.web.bind.annotation.*;
 
 @Controller
 public class MoviesControllerMVCThymeleaf {
 
-    private final MovieRepository movieRepository;
-
     @Autowired
-    public MoviesControllerMVCThymeleaf(MovieRepository movieRepository){
-        this.movieRepository = movieRepository;
-    }
+    MoviesService moviesService;
 
     @GetMapping("/movies")
-    public String movies(Model model) {
-        model.addAttribute("movies", movieRepository.findAll());
+    public String movies(@RequestParam(defaultValue = "ASC") SortingOrder sort, Model model) {
+        model.addAttribute("movies", moviesService.movies(sort));
         return "movies";
     }
 
@@ -31,34 +23,31 @@ public class MoviesControllerMVCThymeleaf {
         return "add-movie";
     }
 
+    @ResponseStatus(HttpStatus.CREATED)
     @PostMapping("/addmovie")
-    public String addMovie(Movie movie, Model model) {
-        movieRepository.save(movie);
-        model.addAttribute("movies", movieRepository.findAll());
-        return "movies";
+    public String addMovie(@RequestParam(defaultValue = "ASC") SortingOrder sort,
+                           Movie movie, Model model) {
+        moviesService.create(movie);
+        return movies(sort, model);
     }
 
     @GetMapping("/edit/{id}")
     public String showUpdateForm(@PathVariable("id") String id, Model model) {
-        Movie movie = movieRepository.findById(id)
-                .orElseThrow(()-> new IllegalArgumentException("Invalid movie Id: " + id));
-        model.addAttribute("movie", movie);
+        model.addAttribute("movie", moviesService.checkId(id));
         return "update-movie";
     }
 
     @PostMapping("/update/{id}")
-    public String updateMovie(@PathVariable("id") String id, Movie movie, Model model) {
-        movieRepository.save(movie);
-        model.addAttribute("movies", movieRepository.findAll());
-        return "movies";
+    public String updateMovie(@RequestParam(defaultValue = "ASC") SortingOrder sort,
+                               Movie movie, Model model) {
+        moviesService.create(movie);
+        return movies(sort, model);
     }
 
     @GetMapping("/delete/{id}")
-    public String deleteMovie(@PathVariable("id") String id, Model model) {
-        Movie movie = movieRepository.findById(id)
-                .orElseThrow(()-> new IllegalArgumentException("Invalid movie Id: " + id));
-        movieRepository.delete(movie);
-        model.addAttribute("movies",movieRepository.findAll());
-        return "movies";
+    public String deleteMovie(@RequestParam(defaultValue = "ASC") SortingOrder sort,
+                              @PathVariable("id") String id, Model model) {
+        moviesService.delete(id);
+        return movies(sort, model);
     }
 }
